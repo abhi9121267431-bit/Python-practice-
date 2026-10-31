@@ -1,4 +1,3 @@
-
 import json
 import os
 
@@ -79,8 +78,44 @@ while True:
         if not found:
             print("Student not found.")
 
-    # Exit
     elif choice == "4":
+        search_roll = input("Enter roll number to update: ")
+        found = False
+
+        for student in students:
+            if student["roll_no"] == search_roll:
+                print("Current name:", student["name"])
+                print("Current marks:", student["marks"])
+
+                new_name = input("Enter new name (or press Enter to keep): ")
+                if new_name.strip():
+                    student["name"] = new_name
+
+                new_marks = input("Enter new marks (or press Enter to keep): ")
+
+                if new_marks.strip():
+                    try:
+                        marks = float(new_marks)
+                        if 0 <= marks <= 100:
+                            student["marks"] = marks
+                        else:
+                            print("Marks must be between 0 and 100.")
+                            continue
+                    except ValueError:
+                        print("Invalid marks. Update cancelled.")
+                        continue
+
+                with open(FILE_NAME, "w") as file:
+                    json.dump(students, file, indent=4)
+
+                print("Student updated successfully!")
+                found = True
+                break
+
+        if not found:
+            print("Student not found.")
+
+    elif choice == "5":
         print("Thank you for using the system!")
         break
 
