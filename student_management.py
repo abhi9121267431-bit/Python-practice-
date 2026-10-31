@@ -10,7 +10,6 @@ if os.path.exists(FILE_NAME):
 else:
     students = []
 
-
 while True:
     print("\n--- STUDENT MANAGEMENT SYSTEM ---")
     print("1. Add Student")
@@ -33,16 +32,10 @@ while True:
 
         students.append(student)
 
-    with open(FILE_NAME, "w") as file:
-        json.dump(students, file, indent=4)
+        with open(FILE_NAME, "w") as file:
+            json.dump(students, file, indent=4)
 
-    print("Student added successfully!")
-
-        
-    with open(FILE_NAME, "w") as file:
-        json.dump(students, file, indent=4)
-
-    print("Student added successfully!")
+        print("Student added successfully!")
 
     elif choice == "2":
         if len(students) == 0:
