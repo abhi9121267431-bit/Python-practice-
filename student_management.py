@@ -3,12 +3,18 @@ import json
 import os
 
 FILE_NAME = "students.json"
+PASS_MARK = 35
 
 
 # Load existing student records
 if os.path.exists(FILE_NAME):
-    with open(FILE_NAME, "r") as file:
-        students = json.load(file)
+    try:
+        with open(FILE_NAME, "r") as file:
+            students = json.load(file)
+        if not isinstance(students, list):
+            students = []
+    except (json.JSONDecodeError, OSError):
+        students = []
 else:
     students = []
 
@@ -19,7 +25,7 @@ def save_students():
         json.dump(students, file, indent=4)
 
 
-# Calculate student grade
+# Calculate grade
 def calculate_grade(marks):
     if marks >= 90:
         return "A"
@@ -35,10 +41,12 @@ def calculate_grade(marks):
 
 # Display student details
 def display_student(student):
+    marks = student["marks"]
     print("\nName:", student["name"])
     print("Roll No:", student["roll_no"])
-    print("Marks:", student["marks"])
-    print("Grade:", calculate_grade(student["marks"]))
+    print("Marks:", marks)
+    print("Grade:", calculate_grade(marks))
+    print("Result:", "Pass" if marks >= PASS_MARK else "Fail")
 
 
 # Main program
@@ -49,7 +57,8 @@ while True:
     print("3. Search Student")
     print("4. Update Student")
     print("5. Delete Student")
-    print("6. Exit")
+    print("6. Class Summary Report")
+    print("7. Exit")
 
     choice = input("Enter your choice: ").strip()
 
@@ -62,17 +71,17 @@ while True:
             print("Name and roll number cannot be empty.")
             continue
 
+        if any(s["roll_no"] == roll_no for s in students):
+            print("Roll number already exists.")
+            continue
+
         try:
-            marks = float(input("Enter marks: "))
+            marks = float(input("Enter marks (0-100): "))
             if not 0 <= marks <= 100:
                 print("Marks must be between 0 and 100.")
                 continue
         except ValueError:
             print("Enter valid numeric marks.")
-            continue
-
-        if any(s["roll_no"] == roll_no for s in students):
-            print("Roll number already exists.")
             continue
 
         student = {
@@ -85,7 +94,7 @@ while True:
         save_students()
 
         print("Student added successfully!")
-        print("Grade:", calculate_grade(marks))
+        display_student(student)
 
     # View Students
     elif choice == "2":
@@ -98,7 +107,6 @@ while True:
     # Search Student
     elif choice == "3":
         search_roll = input("Enter roll number: ").strip()
-
         found = False
 
         for student in students:
@@ -127,16 +135,14 @@ while True:
                     "Enter new marks (Enter to keep current): "
                 ).strip()
 
-                # Validate marks before changing the record
+                # Validate marks before updating
                 if new_marks:
                     try:
                         marks = float(new_marks)
-
                         if not 0 <= marks <= 100:
                             print("Marks must be between 0 and 100.")
                             found = True
                             break
-
                     except ValueError:
                         print("Invalid marks.")
                         found = True
@@ -149,7 +155,6 @@ while True:
                     student["marks"] = marks
 
                 save_students()
-
                 print("Student updated successfully!")
                 display_student(student)
 
@@ -166,7 +171,7 @@ while True:
 
         for student in students:
             if student["roll_no"] == delete_roll:
-                print("Student found:", student["name"])
+                display_student(student)
 
                 confirm = input(
                     "Confirm deletion? (yes/no): "
@@ -186,10 +191,37 @@ while True:
         if not found:
             print("Student not found.")
 
-    # Exit
+    # Class Summary Report
     elif choice == "6":
+        if not students:
+            print("No students found.")
+        else:
+            total_students = len(students)
+            total_marks = sum(s["marks"] for s in students)
+            average_marks = total_marks / total_students
+
+            topper = max(students, key=lambda s: s["marks"])
+            passed = sum(
+                1 for s in students if s["marks"] >= PASS_MARK
+            )
+            failed = total_students - passed
+
+            print("\n--- CLASS SUMMARY REPORT ---")
+            print("Total Students:", total_students)
+            print("Average Marks:", round(average_marks, 2))
+            print("Class Topper:", topper["name"])
+            print("Topper Roll No:", topper["roll_no"])
+            print("Topper Marks:", topper["marks"])
+            print("Topper Grade:", calculate_grade(topper["marks"]))
+            print("Passed Students:", passed)
+            print("Failed Students:", failed)
+
+    # Exit
+    elif choice == "7":
         print("Thank you for using the system!")
         break
 
     else:
         print("Invalid choice. Try again.")
+
+
