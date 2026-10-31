@@ -32,7 +32,11 @@ while True:
         }
 
         students.append(student)
-        print("Student added successfully!")
+        
+    with open(FILE_NAME, "w") as file:
+        json.dump(students, file, indent=4)
+
+    print("Student added successfully!")
 
     elif choice == "2":
         if len(students) == 0:
