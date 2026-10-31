@@ -1,4 +1,9 @@
 
+import json
+import os
+
+FILE_NAME = "students.json"
+
 students = []
 
 while True:
