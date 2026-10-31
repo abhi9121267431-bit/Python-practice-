@@ -4,7 +4,12 @@ import os
 
 FILE_NAME = "students.json"
 
-students = []
+if os.path.exists(FILE_NAME):
+    with open(FILE_NAME, "r") as file:
+        students = json.load(file)
+else:
+    students = []
+
 
 while True:
     print("\n--- STUDENT MANAGEMENT SYSTEM ---")
